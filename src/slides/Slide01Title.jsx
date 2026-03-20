@@ -13,7 +13,7 @@ export default function Slide01Title() {
         </p>
         <p style={{ fontSize:14, color:'var(--text-secondary)' }}>Alex Toma · Design Patterns Course · 2026</p>
       </div>
-      <div style={{ position:'absolute', right:80, top:'50%', transform:'translateY(-50%)' }}>
+      <div className="cover-diagram" style={{ position:'absolute', right:80, top:'50%', transform:'translateY(-50%)' }}>
         <ProxyCoverSVG />
       </div>
       <div className="bottom-rule" />

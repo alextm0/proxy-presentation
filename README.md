@@ -1,16 +1,44 @@
-# React + Vite
+# Proxy Design Pattern — Lecture Presentation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interactive 11-slide lecture presentation built with Vite + React + GSAP.
 
-Currently, two official plugins are available:
+## Run
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev
+```
 
-## React Compiler
+Opens at http://localhost:5173
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Keyboard Shortcuts
 
-## Expanding the ESLint configuration
+| Key | Action |
+|-----|--------|
+| `→` / `Space` | Next slide or build step |
+| `←` | Previous slide |
+| `P` | Toggle presenter notes |
+| `H` | Cycle code highlights |
+| `R` | Reset slide animations |
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Slides
+
+1. Title
+2. The Problem (photo gallery hook)
+3. The Intuition (3 proxy types)
+4. UML Structure (step-by-step)
+5. Lazy Loading — Java toy example
+6. Interactive Quiz
+7. Production: Spring @Cacheable
+8. Production: OkHttp Interceptors
+9. Built-in: JS/TS Native Proxy
+10. Proxy vs Decorator
+11. When to Use / Summary
+
+## Build
+
+```bash
+npm run build
+```
+
+Outputs to `dist/`.

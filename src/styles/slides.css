@@ -138,6 +138,7 @@
 }
 @media (max-width: 1024px) {
   .two-col, .two-col-code { grid-template-columns: 1fr; }
+  .cover-diagram { display: none; }
 }
 
 /* ── Print ── */
