@@ -1,0 +1,31 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,h2,h3,h4 { font-family: 'DM Sans', system-ui, sans-serif; }
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.gold-shimmer {
+  background: linear-gradient(90deg, var(--primary) 0%, var(--primary-bright) 40%, #E8C547 50%, var(--primary-bright) 60%, var(--primary) 100%);
+  background-size: 800px 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s linear infinite;
+}
+
+@keyframes pulse-gold {
+  0%,100% { box-shadow: 0 0 0 0 rgba(184,150,12,0.35); }
+  50%      { box-shadow: 0 0 0 10px rgba(184,150,12,0); }
+}
