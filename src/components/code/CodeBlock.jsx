@@ -7,11 +7,11 @@ import gsap from 'gsap'
  * highlightStep: number (external, from usePresentation — for H key manual advance)
  * lang: string
  */
-export default function CodeBlock({ lines = [], highlights = [], highlightStep = 0, lang = 'java' }) {
+export default function CodeBlock({ lines = [], highlights = [], highlightStep = 0, lang = 'java', filename = '' }) {
   const containerRef = useRef(null)
-  const barRefs      = useRef({})   // lineId → bar element
-  const tipRefs      = useRef({})   // lineId → tooltip element
-  const tlRef        = useRef(null) // auto-cycle timeline
+  const barRefs      = useRef({})
+  const tipRefs      = useRef({})
+  const tlRef        = useRef(null)
 
   // Auto-cycle on mount
   useEffect(() => {
@@ -24,20 +24,19 @@ export default function CodeBlock({ lines = [], highlights = [], highlightStep =
         const tip = tipRefs.current[lineId]
         if (!bar || !tip) return
         tl.set(tip, { opacity: 0, y: 4 })
-        tl.to(bar, { width: '100%', duration: 0.3, ease: 'power2.out' }, `+=${i === 0 ? 0.6 : 0.3}`)
+        tl.to(bar, { width: '100%', duration: 0.3, ease: 'power2.out' }, `+=${i === 0 ? 0.7 : 0.35}`)
         tl.to(tip, { opacity: 1, y: 0, duration: 0.2 }, '<')
-        tl.to({}, { duration: 1.5 }) // hold
+        tl.to({}, { duration: 1.6 })
         if (i < highlights.length - 1) {
           tl.to(bar, { width: 0, duration: 0.2, ease: 'power2.in' })
           tl.to(tip, { opacity: 0, duration: 0.15 }, '<')
         }
-        // last highlight stays
       })
     }, containerRef)
     return () => ctx.revert()
-  }, []) // run once on mount
+  }, [])
 
-  // Manual H-key advance — kill auto-cycle and jump to specific step
+  // Manual H-key advance
   useEffect(() => {
     if (!highlights.length) return
     if (tlRef.current) { tlRef.current.kill(); tlRef.current = null }
@@ -54,15 +53,24 @@ export default function CodeBlock({ lines = [], highlights = [], highlightStep =
 
   function tokenColor(type) {
     const map = {
-      keyword: '#B8960C', string: '#2E7D32', comment: '#9E9E9E',
-      type: '#1565C0', method: '#6A1B9A', number: '#D84315',
+      keyword: '#C792EA',  // soft purple
+      string:  '#C3E88D',  // green
+      comment: '#546E7A',  // muted blue-grey
+      type:    '#FFCB6B',  // amber/yellow
+      method:  '#82AAFF',  // soft blue
+      number:  '#F78C6C',  // peach
     }
-    return map[type] || '#1A1A1A'
+    return map[type] || '#EEFFFF'
   }
 
   return (
     <div className="code-block" ref={containerRef}>
-      <span className="code-lang-badge">{lang}</span>
+      {filename && (
+        <div className="code-block-header">
+          <div className="code-filename-tab">{filename}</div>
+        </div>
+      )}
+      <span className="code-lang-badge" style={{ top: filename ? 46 : 10 }}>{lang}</span>
       <pre>
         {lines.map((line, i) => {
           const hlData = highlights.find(h => h.lineId === line.id)

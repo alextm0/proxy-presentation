@@ -18,7 +18,7 @@ export default function ProgressBar() {
     <div id="progress-bar" ref={barRef} style={{
       position: 'fixed', top: 0, left: 0, height: 3,
       background: 'linear-gradient(90deg, #B8960C, #D4AF37)',
-      zIndex: 1000, width: `${(1/11)*100}%`,
+      zIndex: 1000,
     }} />
   )
 }

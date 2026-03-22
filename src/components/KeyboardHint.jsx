@@ -1,3 +1,5 @@
+import { usePresentation } from '../hooks/usePresentation'
+
 const kbdStyle = {
   background: 'var(--surface)', border: '1px solid var(--border)',
   borderRadius: 3, padding: '1px 5px', fontSize: 9,
@@ -5,6 +7,10 @@ const kbdStyle = {
 }
 
 export default function KeyboardHint() {
+  const { presentationMode } = usePresentation()
+
+  if (presentationMode) return null
+
   return (
     <div style={{
       position: 'fixed', bottom: 76, right: 24,
@@ -12,6 +18,7 @@ export default function KeyboardHint() {
       zIndex: 50, fontFamily: "'JetBrains Mono', monospace",
       textAlign: 'right', lineHeight: 1.9,
     }}>
+      <kbd style={kbdStyle}>F</kbd> present &nbsp;
       <kbd style={kbdStyle}>→</kbd> next &nbsp;
       <kbd style={kbdStyle}>←</kbd> prev &nbsp;
       <kbd style={kbdStyle}>P</kbd> notes &nbsp;

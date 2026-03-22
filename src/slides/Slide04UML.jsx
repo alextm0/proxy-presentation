@@ -1,34 +1,23 @@
-import { useEffect } from 'react'
 import UMLDiagram from '../diagrams/UMLDiagram'
 
-const MAX_STEP = 5
-
-export default function Slide04UML({ onIntercept, slideStep, advanceStep }) {
-  useEffect(() => {
-    onIntercept?.(() => {
-      if (slideStep < MAX_STEP) { advanceStep(); return true }
-      return false
-    })
-  }, [slideStep])
-
+export default function Slide04UML() {
   return (
     <div className="slide-shell">
-      <h2 className="slide-title">The Structure</h2>
-      <p className="slide-subtitle">Press → to build the diagram step by step.</p>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+        <h2 className="slide-title" style={{ marginBottom: 0 }}>UML Class Diagram</h2>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <span className="badge">Structure</span>
+          <span className="badge success">Static View</span>
+        </div>
+      </div>
+      <p className="slide-subtitle" style={{ marginBottom: 10 }}>
+        The relationship between the Client, Proxy, and RealSubject.
+      </p>
 
-      <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <UMLDiagram step={slideStep} />
+      <div style={{ flex: 1, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 0 }}>
+        <UMLDiagram />
       </div>
 
-      <div style={{ display:'flex', gap:8, marginTop:12 }}>
-        {Array.from({ length: MAX_STEP + 1 }).map((_, i) => (
-          <div key={i} style={{
-            width:8, height:8, borderRadius:'50%',
-            background: slideStep >= i ? 'var(--primary)' : 'var(--border)',
-            transition:'background 300ms',
-          }} />
-        ))}
-      </div>
       <div className="bottom-rule" />
     </div>
   )

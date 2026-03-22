@@ -1,9 +1,9 @@
 export const T = {
-  keyword: '#B8960C',
-  string:  '#2E7D32',
-  comment: '#9E9E9E',
-  type:    '#1565C0',
-  method:  '#6A1B9A',
-  number:  '#D84315',
-  plain:   '#1A1A1A',
+  keyword: '#C792EA',  // soft purple
+  string:  '#C3E88D',  // green
+  comment: '#546E7A',  // muted blue-grey
+  type:    '#FFCB6B',  // amber/yellow
+  method:  '#82AAFF',  // soft blue
+  number:  '#F78C6C',  // peach
+  plain:   '#EEFFFF',  // light grey/white
 }

@@ -1,4 +1,8 @@
+import { usePresentation } from '../hooks/usePresentation'
+
 export default function NavControls() {
+  const { presentationMode } = usePresentation()
+
   const btnStyle = {
     background: 'var(--surface)', border: '1px solid var(--border)',
     color: 'var(--text)', width: 42, height: 42, borderRadius: '50%',
@@ -14,6 +18,8 @@ export default function NavControls() {
   function handlePrev() {
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }))
   }
+
+  if (presentationMode) return null
 
   return (
     <div style={{

@@ -1,82 +1,94 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 
-export default function Slide02Problem({ onIntercept, slideStep, advanceStep }) {
-  const term1Ref    = useRef(null)
-  const term2Ref    = useRef(null)
-  const questionRef = useRef(null)
+export default function Introduction() {
   const containerRef = useRef(null)
 
-  // Register intercept: step 0 → reveal question; step 1 → pass through
-  useEffect(() => {
-    onIntercept?.(() => {
-      if (slideStep === 0) { advanceStep(); return true }
-      return false
-    })
-  }, [slideStep])
-
-  // Auto: terminal lines stagger in on mount
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        [term1Ref.current, term2Ref.current],
-        { opacity:0, x:-12 },
-        { opacity:1, x:0, duration:0.35, stagger:0.5, ease:'power2.out', delay:0.4 }
-      )
-    }, containerRef)
-    return () => ctx.revert()
-  }, [])
-
-  // Step 1: reveal question
-  useEffect(() => {
-    if (slideStep >= 1 && questionRef.current) {
-      gsap.fromTo(questionRef.current,
-        { opacity:0, y:10 },
-        { opacity:1, y:0, duration:0.4, ease:'power2.out' }
-      )
-    }
-  }, [slideStep])
-
-  const imgGrid = Array.from({ length: 12 }).map((_, i) => (
-    <div key={i} style={{
-      background:'#E8E0CC', borderRadius:6, aspectRatio:'4/3',
-      display:'flex', alignItems:'center', justifyContent:'center',
-      fontSize:22, color:'#B8960C',
-    }}>🖼</div>
-  ))
+  const sections = [
+    { num: '01', title: 'The Starting Point', desc: 'Understanding why proxies are everywhere and what problem they solve.' },
+    { num: '02', title: 'Core Intuition', desc: 'Identity, interception, and the "invisible" nature of modern proxies.' },
+    { num: '03', title: 'The Structure', desc: 'UML breakdown: Subject, Proxy, and RealSubject relationships.' },
+    { num: '04', title: 'Hands-on: Toy Example', desc: 'Building a protection proxy step-by-step from a naive service.' },
+    { num: '05', title: 'OSS: Modern Reality', desc: 'Deep dive into Prisma and native Proxy in your frontend stack.' },
+    { num: '06', title: 'The Comparison', desc: 'Final bridge: Proxy vs Decorator and when to use each.' },
+  ]
 
   return (
     <div className="slide-shell" ref={containerRef}>
-      <h2 className="slide-title">You're building a photo gallery app.</h2>
-      <p className="slide-subtitle">A classic problem every developer encounters.</p>
-
-      <div className="two-col" style={{ flex:1, alignItems:'center' }}>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
-          {imgGrid}
-        </div>
-
-        <div>
-          <div className="terminal">
-            <div ref={term1Ref} style={{ opacity:0 }}>
-              <span style={{ color:'#EF9A9A' }}>❌ Without proxy:</span><br/>
-              <span style={{ color:'#9E9E9E' }}>&nbsp;&nbsp;"Loaded 12 images... </span>
-              <span style={{ color:'#EF9A9A', fontWeight:600 }}>8400ms</span>
-              <span style={{ color:'#9E9E9E' }}> startup"</span>
-            </div>
-            <div ref={term2Ref} style={{ opacity:0, marginTop:14 }}>
-              <span style={{ color:'#A5D6A7' }}>✅ With proxy:</span><br/>
-              <span style={{ color:'#9E9E9E' }}>&nbsp;&nbsp;"Loaded 0 images... &nbsp;</span>
-              <span style={{ color:'#A5D6A7', fontWeight:600 }}>120ms</span>
-              <span style={{ color:'#9E9E9E' }}> startup"</span>
-            </div>
-          </div>
-        </div>
+      <div style={{ marginBottom: 40, borderLeft: '6px solid #B8960C', paddingLeft: 24 }}>
+        <h1 style={{
+          fontSize: 54,
+          fontWeight: 800,
+          color: '#1A1A1A',
+          margin: 0,
+          letterSpacing: '-1px'
+        }}>
+          Table of contents
+        </h1>
+        <p style={{ fontSize: 18, color: '#666', margin: '4px 0 0 0' }}>
+          Our journey through the Proxy Design Pattern
+        </p>
       </div>
 
-      <div ref={questionRef} style={{ opacity:0, marginTop:24, textAlign:'center' }}>
-        <p style={{ fontSize:20, fontWeight:700, color:'var(--primary)' }}>
-          Why load 12 images if the user might only view 2?
-        </p>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: '30px',
+        flex: 1,
+        padding: '0 10px',
+      }}>
+        {sections.map((s, i) => (
+          <div key={i} className="card" style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 16,
+            padding: '30px 20px',
+            background: 'var(--surface)',
+            border: '2px solid var(--border)',
+            borderRadius: 24,
+            transition: 'all 0.3s ease',
+            cursor: 'default'
+          }}>
+            <div style={{
+              width: 90,
+              height: 90,
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #FDFCFB 0%, #E2D1C3 100%)',
+              border: '2px solid #B8960C',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: 36,
+              fontWeight: 900,
+              color: '#B8960C',
+              boxShadow: '0 10px 20px rgba(184, 150, 12, 0.1)'
+            }}>
+              {s.num}
+            </div>
+            <h3 style={{
+              fontSize: 22,
+              fontWeight: 800,
+              color: '#1A1A1A',
+              textAlign: 'center',
+              margin: 0,
+              fontFamily: "'DM Sans', sans-serif"
+            }}>
+              {s.title}
+            </h3>
+            <p style={{
+              fontSize: 15,
+              color: '#999999',
+              textAlign: 'center',
+              margin: 0,
+              lineHeight: 1.5,
+              padding: '0 10px'
+            }}>
+              {s.desc}
+            </p>
+          </div>
+        ))}
       </div>
 
       <div className="bottom-rule" />

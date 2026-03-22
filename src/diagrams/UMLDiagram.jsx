@@ -1,93 +1,113 @@
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
+import { useRef } from 'react'
 
-// step: 0=empty, 1=interface, 2=realsubject+impl arrow, 3=proxy+has-a arrow, 4=client+uses arrow, 5=callout
-export default function UMLDiagram({ step = 0 }) {
-  const ifaceRef     = useRef(null)
-  const realRef      = useRef(null)
-  const implArrRef   = useRef(null)
-  const proxyRef     = useRef(null)
-  const hasAArrRef   = useRef(null)
-  const clientRef    = useRef(null)
-  const usesArrRef   = useRef(null)
-  const calloutRef   = useRef(null)
-
-  useEffect(() => {
-    const allRefs = [ifaceRef, realRef, implArrRef, proxyRef, hasAArrRef, clientRef, usesArrRef, calloutRef]
-    const show = (ref) => { if (ref.current) gsap.to(ref.current, { opacity:1, y:0, duration:0.4, ease:'power2.out' }) }
-
-    // Reset all to hidden
-    allRefs.forEach(r => { if (r.current) gsap.set(r.current, { opacity:0, y:8 }) })
-
-    if (step >= 1) show(ifaceRef)
-    if (step >= 2) { show(realRef); show(implArrRef) }
-    if (step >= 3) { show(proxyRef); show(hasAArrRef) }
-    if (step >= 4) { show(clientRef); show(usesArrRef) }
-    if (step >= 5) show(calloutRef)
-  }, [step])
+/**
+ * UMLDiagram component for Proxy Design Pattern
+ * Static version with all elements visible.
+ */
+export default function UMLDiagram() {
+  const containerRef = useRef(null)
 
   return (
-    <svg width="560" height="340" viewBox="0 0 560 340" style={{ overflow:'visible' }}>
-      <defs>
-        <marker id="uml-ah" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-          <polygon points="0 0,10 3.5,0 7" fill="#B8960C"/>
-        </marker>
-      </defs>
+    <div ref={containerRef} style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <svg 
+        viewBox="0 0 800 460" 
+        width="100%" 
+        height="100%" 
+        preserveAspectRatio="xMidYMid meet"
+        style={{ overflow: 'visible', maxWidth: '900px' }}
+      >
+        <defs>
+          {/* UML Standard Arrows */}
+          <marker id="uml-usage" markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto">
+            <path d="M0,0 L12,5 L0,10" fill="none" stroke="#555" strokeWidth="1.5" />
+          </marker>
+          
+          <marker id="uml-implementation" markerWidth="14" markerHeight="14" refX="13" refY="7" orient="auto">
+            <polygon points="0,0 13,7 0,14" fill="white" stroke="#B8960C" strokeWidth="1.5" />
+          </marker>
 
-      {/* Interface — top center */}
-      <g ref={ifaceRef} style={{ opacity:0 }}>
-        <rect x="200" y="10" width="160" height="68" rx="8" fill="#FFFDE7" stroke="#B8960C" strokeWidth="2"/>
-        <text x="280" y="32" textAnchor="middle" fontSize="11" fontStyle="italic" fill="#B8960C" fontFamily="Inter,sans-serif">«interface»</text>
-        <text x="280" y="48" textAnchor="middle" fontSize="13" fontWeight="600" fill="#1A1A1A" fontFamily="Inter,sans-serif">Subject</text>
-        <line x1="200" y1="55" x2="360" y2="55" stroke="#E8E0CC" strokeWidth="1"/>
-        <text x="280" y="70" textAnchor="middle" fontSize="11" fill="#6A1B9A" fontFamily="JetBrains Mono,monospace">+ request()</text>
-      </g>
+          <marker id="uml-association" markerWidth="12" markerHeight="10" refX="11" refY="5" orient="auto">
+            <path d="M0,0 L12,5 L0,10" fill="none" stroke="#B8960C" strokeWidth="2" />
+          </marker>
 
-      {/* RealSubject — right */}
-      <g ref={realRef} style={{ opacity:0 }}>
-        <rect x="390" y="160" width="160" height="70" rx="8" fill="#fff" stroke="#E8E0CC" strokeWidth="1.5"/>
-        <text x="470" y="182" textAnchor="middle" fontSize="13" fontWeight="600" fill="#1A1A1A" fontFamily="Inter,sans-serif">RealSubject</text>
-        <line x1="390" y1="190" x2="550" y2="190" stroke="#E8E0CC" strokeWidth="1"/>
-        <text x="470" y="208" textAnchor="middle" fontSize="11" fill="#6A1B9A" fontFamily="JetBrains Mono,monospace">+ request()</text>
-      </g>
-      {/* implements arrow */}
-      <g ref={implArrRef} style={{ opacity:0 }}>
-        <line x1="470" y1="160" x2="340" y2="78" stroke="#B8960C" strokeWidth="1.5" strokeDasharray="6,3" markerEnd="url(#uml-ah)"/>
-        <text x="415" y="110" fontSize="10" fill="#B8960C" fontFamily="Inter,sans-serif">implements</text>
-      </g>
+          <filter id="uml-box-shadow" x="-10%" y="-10%" width="120%" height="120%">
+            <feDropShadow dx="0" dy="2" stdDeviation="4" floodColor="#B8960C" floodOpacity="0.1" />
+          </filter>
+        </defs>
 
-      {/* Proxy — center */}
-      <g ref={proxyRef} style={{ opacity:0 }}>
-        <rect x="190" y="160" width="170" height="92" rx="8" fill="#FFFDE7" stroke="#B8960C" strokeWidth="2"/>
-        <text x="275" y="182" textAnchor="middle" fontSize="13" fontWeight="600" fill="#B8960C" fontFamily="Inter,sans-serif">Proxy</text>
-        <line x1="190" y1="190" x2="360" y2="190" stroke="#E8E0CC" strokeWidth="1"/>
-        <text x="275" y="208" textAnchor="middle" fontSize="10" fill="#1565C0" fontFamily="JetBrains Mono,monospace">- realSubject</text>
-        <line x1="190" y1="214" x2="360" y2="214" stroke="#E8E0CC" strokeWidth="1"/>
-        <text x="275" y="232" textAnchor="middle" fontSize="11" fill="#6A1B9A" fontFamily="JetBrains Mono,monospace">+ request()</text>
-      </g>
-      {/* has-a arrow */}
-      <g ref={hasAArrRef} style={{ opacity:0 }}>
-        <line x1="360" y1="200" x2="390" y2="200" stroke="#B8960C" strokeWidth="1.5" markerEnd="url(#uml-ah)"/>
-        <text x="362" y="216" fontSize="10" fill="#B8960C" fontFamily="Inter,sans-serif">has-a</text>
-      </g>
+        {/* --- Client & Subject --- */}
+        <g className="uml-client-subject">
+          {/* Client Box */}
+          <rect x="50" y="50" width="160" height="60" rx="8" fill="#FFF" stroke="#E8E0CC" strokeWidth="1.5" filter="url(#uml-box-shadow)" />
+          <text x="130" y="88" textAnchor="middle" fontSize="18" fontWeight="700" fill="#1A1A1A" fontFamily="DM Sans, sans-serif">Client</text>
 
-      {/* Client — left */}
-      <g ref={clientRef} style={{ opacity:0 }}>
-        <rect x="20" y="160" width="120" height="50" rx="8" fill="#fff" stroke="#E8E0CC" strokeWidth="1.5"/>
-        <text x="80" y="190" textAnchor="middle" fontSize="13" fontWeight="600" fill="#1A1A1A" fontFamily="Inter,sans-serif">Client</text>
-      </g>
-      {/* uses arrow */}
-      <g ref={usesArrRef} style={{ opacity:0 }}>
-        <line x1="140" y1="185" x2="190" y2="192" stroke="#B8960C" strokeWidth="1.5" markerEnd="url(#uml-ah)"/>
-        <text x="145" y="176" fontSize="10" fill="#B8960C" fontFamily="Inter,sans-serif">uses</text>
-      </g>
+          {/* Subject Interface */}
+          <g transform="translate(320, 30)">
+            <rect x="0" y="0" width="180" height="100" rx="8" fill="#FFFDE7" stroke="#B8960C" strokeWidth="2" filter="url(#uml-box-shadow)" />
+            <text x="90" y="25" textAnchor="middle" fontSize="11" fontStyle="italic" fill="#B8960C" fontFamily="Inter, sans-serif">«interface»</text>
+            <text x="90" y="45" textAnchor="middle" fontSize="18" fontWeight="700" fill="#1A1A1A" fontFamily="DM Sans, sans-serif">Subject</text>
+            <line x1="0" y1="55" x2="180" y2="55" stroke="#E8E0CC" strokeWidth="1" />
+            <text x="15" y="78" fontSize="13" fill="#6A1B9A" fontFamily="JetBrains Mono, monospace">+ request()</text>
+          </g>
 
-      {/* Callout bubble */}
-      <g ref={calloutRef} style={{ opacity:0 }}>
-        <rect x="30" y="285" width="500" height="48" rx="10" fill="#FFF8E1" stroke="#B8960C" strokeWidth="1.5"/>
-        <text x="280" y="307" textAnchor="middle" fontSize="12" fontWeight="600" fill="#B8960C" fontFamily="Inter,sans-serif">Client calls Proxy.</text>
-        <text x="280" y="324" textAnchor="middle" fontSize="12" fill="#555" fontFamily="Inter,sans-serif">Proxy decides whether to call RealSubject.</text>
-      </g>
-    </svg>
+          {/* Client -> Subject Usage */}
+          <path d="M 210 80 L 320 80" fill="none" stroke="#555" strokeWidth="1.5" strokeDasharray="5,4" markerEnd="url(#uml-usage)" />
+          <text x="265" y="70" textAnchor="middle" fontSize="10" fill="#888" fontFamily="Inter, sans-serif" fontWeight="600">«uses»</text>
+        </g>
+
+        {/* --- RealSubject --- */}
+        <g className="uml-realsubject">
+          <g transform="translate(500, 260)">
+            <rect x="0" y="0" width="220" height="120" rx="8" fill="#FFF" stroke="#E8E0CC" strokeWidth="1.5" filter="url(#uml-box-shadow)" />
+            <text x="110" y="35" textAnchor="middle" fontSize="18" fontWeight="700" fill="#1A1A1A" fontFamily="DM Sans, sans-serif">RealSubject</text>
+            <line x1="0" y1="45" x2="220" y2="45" stroke="#E8E0CC" strokeWidth="1" />
+            <line x1="0" y1="75" x2="220" y2="75" stroke="#E8E0CC" strokeWidth="1" />
+            <text x="15" y="65" fontSize="11" fill="#888" fontFamily="JetBrains Mono, monospace">// core logic</text>
+            <text x="15" y="100" fontSize="13" fill="#6A1B9A" fontFamily="JetBrains Mono, monospace">+ request()</text>
+          </g>
+
+          {/* RealSubject -> Subject Implementation */}
+          <path d="M 610 260 L 610 210 L 410 210 L 410 130" fill="none" stroke="#B8960C" strokeWidth="1.5" strokeDasharray="6,4" markerEnd="url(#uml-implementation)" />
+        </g>
+
+        {/* --- Proxy --- */}
+        <g className="uml-proxy">
+          <g transform="translate(80, 260)">
+            <rect x="0" y="0" width="240" height="140" rx="8" fill="#FFFDE7" stroke="#B8960C" strokeWidth="2" filter="url(#uml-box-shadow)" />
+            <text x="120" y="35" textAnchor="middle" fontSize="18" fontWeight="700" fill="#B8960C" fontFamily="DM Sans, sans-serif">Proxy</text>
+            <line x1="0" y1="45" x2="240" y2="45" stroke="#E8E0CC" strokeWidth="1" />
+            <text x="15" y="65" fontSize="12" fill="#1565C0" fontFamily="JetBrains Mono, monospace">- realSubject: Subject</text>
+            <line x1="0" y1="75" x2="240" y2="75" stroke="#E8E0CC" strokeWidth="1" />
+            <text x="15" y="100" fontSize="13" fill="#6A1B9A" fontFamily="JetBrains Mono, monospace">+ request()</text>
+            <text x="15" y="122" fontSize="10" fill="#555" fontFamily="Inter, sans-serif" opacity="0.7">if (!realSubject) init()</text>
+          </g>
+
+          {/* Proxy -> Subject Implementation */}
+          <path d="M 200 260 L 200 210 L 410 210 L 410 130" fill="none" stroke="#B8960C" strokeWidth="1.5" strokeDasharray="6,4" markerEnd="url(#uml-implementation)" />
+        </g>
+
+        {/* --- Delegation --- */}
+        <g className="uml-delegation">
+          {/* Proxy -> RealSubject Association/Delegation */}
+          <path d="M 320 310 L 500 310" fill="none" stroke="#B8960C" strokeWidth="2" markerEnd="url(#uml-association)" />
+          <text x="410" y="300" textAnchor="middle" fontSize="12" fill="#B8960C" fontFamily="Inter, sans-serif" fontWeight="700">delegates to</text>
+          
+          {/* Background Highlight for Proxy delegation */}
+          <rect x="15" y="90" width="210" height="25" rx="4" fill="#B8960C" fillOpacity="0.05" transform="translate(80, 260)" />
+        </g>
+
+        {/* --- Legend --- */}
+        <g transform="translate(50, 440)">
+          <line x1="0" y1="0" x2="40" y2="0" stroke="#555" strokeWidth="1.5" strokeDasharray="4,3" markerEnd="url(#uml-usage)" />
+          <text x="50" y="4" fontSize="11" fill="#555" fontWeight="600" fontFamily="Inter, sans-serif">usage</text>
+
+          <line x1="130" y1="0" x2="170" y2="0" stroke="#B8960C" strokeWidth="1.5" strokeDasharray="4,3" markerEnd="url(#uml-implementation)" />
+          <text x="180" y="4" fontSize="11" fill="#B8960C" fontWeight="600" fontFamily="Inter, sans-serif">implements</text>
+
+          <line x1="280" y1="0" x2="320" y2="0" stroke="#B8960C" strokeWidth="2" markerEnd="url(#uml-association)" />
+          <text x="330" y="4" fontSize="11" fill="#B8960C" fontWeight="700" fontFamily="Inter, sans-serif">delegation</text>
+        </g>
+      </svg>
+    </div>
   )
 }
