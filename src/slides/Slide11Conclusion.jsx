@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 
-export default function Slide12Conclusion() {
+export default function Slide11Conclusion() {
   const containerRef = useRef(null)
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export default function Slide12Conclusion() {
         {[
           { title: 'When to use', items: ['Lazy Creation', 'Access Control', 'Remote Objects'] },
           { title: 'Key Benefits', items: ['Transparency', 'Lifecycle Mgmt', 'Efficiency'] },
-          { title: 'Real World', items: ['Spring @Cacheable', 'OkHttp Interceptors', 'Vue Reactivity'] }
+          { title: 'Real World', items: ['Spring @Cacheable', 'Pyro5 Remote Proxy', 'Vue Reactivity'] }
         ].map((col, i) => (
           <div key={i} className="conclusion-item" style={{ textAlign: 'left' }}>
             <h3 style={{ color: 'var(--primary)', fontSize: '20px', borderBottom: '2px solid var(--border)', paddingBottom: '10px', marginBottom: '15px' }}>

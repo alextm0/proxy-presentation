@@ -28,7 +28,7 @@ export default function MagicCodeBlock({
     if (!highlighterPromise) {
       highlighterPromise = createHighlighter({
         themes: [theme],
-        langs: [lang, 'typescript', 'java', 'javascript', 'json', 'rust'],
+        langs: [lang, 'typescript', 'java', 'javascript', 'json', 'rust', 'python'],
       }).then(hl => { globalHighlighter = hl; return hl })
     }
     highlighterPromise.then(hl => {

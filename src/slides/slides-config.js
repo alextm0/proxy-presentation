@@ -10,7 +10,7 @@ export const SLIDE_METADATA = {
   Slide05ToyProblem: { title: "Toy Example: The Problem", index: 6 },
   Slide06ToySolution: { title: "Toy Example: The Proxy Solution", index: 7 },
   Slide07Hibernate: { title: "OSS Example: Hibernate ORM", index: 8 },
-  Slide08Prisma: { title: "OSS Example: Prisma ORM", index: 9 },
+  Slide08Pyro: { title: "OSS Example (Python): Pyro5", index: 9 },
   Slide09Comparison: { title: "Proxy vs Decorator", index: 10 },
   Slide11Conclusion: { title: "Conclusion & Takeaways", index: 11 },
 };
