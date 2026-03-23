@@ -105,7 +105,7 @@ const PROXY_TYPES = [
   }
 ]
 
-export default function Slide11ProxyTypes() {
+export default function Slide10ProxyTypes() {
   const containerRef = useRef(null)
 
   useEffect(() => {
