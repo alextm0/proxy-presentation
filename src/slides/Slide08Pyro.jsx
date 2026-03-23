@@ -36,11 +36,10 @@ def _pyroInvoke(self, methodname, vargs, kwargs, flags=0, objectId=None):
 const CODE_STEPS = [step1, step2, step3, step4]
 
 const STEP_HIGHLIGHTS = [
-  [],
-  [3, 4],
-  [1, 4, 6],
-  [1, 2, 4],
-  [2, 3, 4, 6],
+  [3, 4, 5],
+  [1, 3, 6],
+  [1, 2, 3, 5],
+  [1, 2, 4, 5, 6],
 ]
 
 const VERIFY_URL = 'https://raw.githubusercontent.com/irmen/Pyro5/master/Pyro5/client.py'
@@ -162,7 +161,7 @@ function CodeView({ codeStep }) {
         </p>
         <div style={{ display: 'grid', gap: 12 }}>
           <div className="callout-gold" style={{ fontSize: 12, padding: '10px 12px', lineHeight: 1.5 }}>
-            <strong>Type:</strong> Remote Proxy (not Virtual/Lazy).
+            <strong>Interesting detail:</strong> dotted calls like <code>bank.accounts.get_total()</code> are built dynamically before dispatch.
           </div>
           <div className="callout-gold" style={{ fontSize: 12, padding: '10px 12px', lineHeight: 1.5 }}>
             <strong>Control point:</strong> hides serialization/network/protocol details.
