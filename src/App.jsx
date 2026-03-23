@@ -5,15 +5,22 @@ import SlideCounter   from './components/SlideCounter'
 import PresenterNotes from './components/PresenterNotes'
 import NavControls    from './components/NavControls'
 import KeyboardHint   from './components/KeyboardHint'
+import { SLIDE_METADATA } from './slides/slides-config'
 import gsap           from 'gsap'
 
 // Dynamically import all slides from the slides directory
 const slideModules = import.meta.glob('./slides/Slide*.jsx', { eager: true })
 
-// Build the SLIDES array and sort them alphabetically by filename to ensure correct order
-const SLIDES = Object.keys(slideModules)
-  .sort()
-  .map(key => slideModules[key].default)
+// Build the SLIDES array and sort using explicit metadata ordering.
+const SLIDES = Object.entries(slideModules)
+  .sort(([a], [b]) => {
+    const aName = a.split('/').pop().replace('.jsx', '')
+    const bName = b.split('/').pop().replace('.jsx', '')
+    const aIndex = SLIDE_METADATA[aName]?.index ?? Number.MAX_SAFE_INTEGER
+    const bIndex = SLIDE_METADATA[bName]?.index ?? Number.MAX_SAFE_INTEGER
+    return aIndex - bIndex || aName.localeCompare(bName)
+  })
+  .map(([, module]) => module.default)
 
 function SlideRouter() {
   const { currentSlide, nextSlide, prevSlide,

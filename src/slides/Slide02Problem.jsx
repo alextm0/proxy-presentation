@@ -8,8 +8,8 @@ export default function Introduction() {
     { num: '01', title: 'The Starting Point', desc: 'Understanding why proxies are everywhere and what problem they solve.' },
     { num: '02', title: 'Core Intuition', desc: 'Identity, interception, and the "invisible" nature of modern proxies.' },
     { num: '03', title: 'The Structure', desc: 'UML breakdown: Subject, Proxy, and RealSubject relationships.' },
-    { num: '04', title: 'Hands-on: Toy Example', desc: 'Building a protection proxy step-by-step from a naive service.' },
-    { num: '05', title: 'OSS: Modern Reality', desc: 'Deep dive into Prisma and native Proxy in your frontend stack.' },
+    { num: '04', title: 'Proxy Types', desc: 'Virtual, Remote, Protection, and Caching as practical categories.' },
+    { num: '05', title: 'Hands-on + OSS', desc: 'Toy implementation first, then real-world ORM examples.' },
     { num: '06', title: 'The Comparison', desc: 'Final bridge: Proxy vs Decorator and when to use each.' },
   ]
 
