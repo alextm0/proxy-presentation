@@ -44,100 +44,56 @@ export default function MagicCodeBlock({
     const isForward = activeStep > prevStepRef.current
     prevStepRef.current = activeStep
 
-    // Only auto-highlight on forward moves. For backward/reset, we just rely on the cleanup.
-    if (!isForward && activeStep !== 0) return
-
-    // Use the explicitly provided line indices for this step
-    const addedIndices = stepHighlights[activeStep] || []
-    if (!addedIndices.length) return
-
-    const overlays = []
-    let fadeTimer, cleanTimer
-
-    // Wait for ShikiMagicMove animation to complete (duration 500ms + stagger ~100ms buffer)
-    const applyTimer = setTimeout(() => {
+    const applyHighlights = () => {
       const container = containerRef.current
       if (!container) return
 
       const pre = container.querySelector('.shiki-magic-move-container')
       if (!pre) return
 
+      // Clean up previous highlights
+      pre.querySelectorAll('.line-highlight').forEach(el => el.remove())
+
       const items = [...pre.querySelectorAll('.shiki-magic-move-item')]
       if (!items.length) return
 
+      // Find the top of the very first line of code as a baseline
       const preRect = pre.getBoundingClientRect()
-
-      // Deduplicate Y offsets to get one entry per logical line
-      const topSet = new Set()
-      items.forEach(el => {
-        const y = Math.round(el.getBoundingClientRect().top - preRect.top)
-        if (y >= 0) topSet.add(y)
-      })
-      const foundTops = [...topSet].sort((a, b) => a - b)
-      if (!foundTops.length) return
-
-      // Robust line height and top calculation
-      const lines = currentCode.split('\n')
-      const firstNonEmptyIdx = lines.findIndex(l => l.trim().length > 0)
-      if (firstNonEmptyIdx === -1) return
+      const firstItem = items[0]
+      const firstTop = Math.round(firstItem.getBoundingClientRect().top - preRect.top)
       
-      const firstTop = foundTops[0]
+      // Calculate average line height from the sorted tops
+      const distinctTops = [...new Set(items.map(el => Math.round(el.getBoundingClientRect().top)))]
+        .sort((a, b) => a - b)
       
-      let lineHeight = 22
-      const diffs = []
-      for (let i = 0; i < foundTops.length - 1; i++) {
-        const d = foundTops[i+1] - foundTops[i]
-        // Filter out very small diffs (tokens on same line) and find the minimal logical gap
-        if (d > 10) diffs.push(d)
-      }
-      if (diffs.length > 0) {
-        lineHeight = Math.min(...diffs)
+      let lineHeight = 24
+      if (distinctTops.length > 1) {
+        lineHeight = distinctTops[1] - distinctTops[0]
       }
 
-      addedIndices.forEach(lineIdx => {
-        // Calculate top based on real line index, accounting for leading empty lines
-        // Add a small 2px offset to center the highlight bar better on the text
-        const topPx = firstTop + (lineIdx - firstNonEmptyIdx) * lineHeight + 2
+      const addedIndices = stepHighlights[activeStep] || []
+      addedIndices.forEach(idx => {
+        const topPx = firstTop + idx * lineHeight - 1
         
         const overlay = document.createElement('div')
+        overlay.className = 'line-highlight'
         overlay.style.cssText = `
           position: absolute;
           top: ${topPx}px;
           left: 0; right: 0;
           height: ${lineHeight}px;
-          background: rgba(184, 150, 12, 0.22);
-          border-left: 3px solid #B8960C;
-          pointer-events: none;
+          background: rgba(77, 124, 255, 0.15);
+          border-left: 4px solid #4d7cff;
+          box-shadow: inset 0 0 10px rgba(77, 124, 255, 0.1);
           z-index: 0;
-          box-sizing: border-box;
-          opacity: 0;
-          transition: opacity 0.3s ease;
         `
         pre.appendChild(overlay)
-        overlays.push(overlay)
-        // Trigger enter animation
-        requestAnimationFrame(() => { overlay.style.opacity = '1' })
       })
-
-      // Fade out after 3s UNLESS permanentHighlights is true
-      if (!permanentHighlights) {
-        fadeTimer = setTimeout(() => {
-          overlays.forEach(el => {
-            el.style.transition = 'opacity 0.8s ease'
-            el.style.opacity = '0'
-          })
-          cleanTimer = setTimeout(() => overlays.forEach(el => el.remove()), 900)
-        }, 3000)
-      }
-    }, 650)
-
-    return () => {
-      clearTimeout(applyTimer)
-      clearTimeout(fadeTimer)
-      clearTimeout(cleanTimer)
-      overlays.forEach(el => el.remove())
     }
-  }, [activeStep, stepHighlights, permanentHighlights, currentCode])
+
+    const timer = setTimeout(applyHighlights, 700)
+    return () => clearTimeout(timer)
+  }, [activeStep, stepHighlights, currentCode])
 
   return (
     <div className="code-block magic-code-container" ref={containerRef} style={{

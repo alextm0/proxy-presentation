@@ -3,156 +3,167 @@ import gsap from 'gsap'
 import { usePresentation } from '../hooks/usePresentation'
 import MagicCodeBlock from '../components/code/MagicCodeBlock'
 
-const step1 = `public interface NotificationSender {
-    void send(Notification n);
+const step1 = `// 1. THE CONTRACT
+public interface WeatherService {
+    String getWeather(User user, String city);
 }
 
-public class ExternalSender implements NotificationSender {
-    @Override
-    public void send(Notification n) {
-        client.send(n);
+// 2. THE REAL SUBJECT
+public class RemoteWeatherService implements WeatherService {
+    public String getWeather(User user, String city) {
+        // pure "business" logic: call remote API
+        return httpClient.get("https://api.weather.com?city=" + city);
     }
 }`
 
-const step2 = `public class SenderProxy implements NotificationSender {
-    private final NotificationSender real;
+const step2 = `// 3. THE CACHING PROXY
+public class CachingWeatherServiceProxy implements WeatherService {
+    private final WeatherService next;
+    private final Map<String, CachedEntry> cache = new HashMap<>();
 
-    public SenderProxy(NotificationSender real) {
-        this.real = real;
+    public CachingWeatherServiceProxy(WeatherService next) {
+        this.next = next;
     }
 
     @Override
-    public void send(Notification n) {
-        real.send(n);
-    }
-}`
-
-const step3 = `public class SenderProxy implements NotificationSender {
-    @Override
-    public void send(Notification n) {
-        if (!env.isProduction()) {
-            log("[DEV] Skip: " + n.to());
-            return;
+    public String getWeather(User user, String city) {
+        CachedEntry entry = cache.get(city);
+        if (entry != null && !entry.isExpired()) {
+            return entry.value;
         }
-
-        real.send(n);
+        String result = next.getWeather(user, city);
+        cache.put(city, new CachedEntry(result, now()));
+        return result;
     }
 }`
 
-const step4 = `public class SenderProxy implements NotificationSender {
+const step3 = `// 4. THE LOGGING PROXY
+public class LoggingWeatherServiceProxy implements WeatherService {
+    private final WeatherService next;
+
+    public LoggingWeatherServiceProxy(WeatherService next) {
+        this.next = next;
+    }
+
     @Override
-    public void send(Notification n) {
-        if (!env.isProduction()) return;
-
-        if (blacklist.contains(n.to())) return;
-
-        if (rateLimiter.isExceeded()) {
-            throw new LimitException();
+    public String getWeather(User user, String city) {
+        long start = System.currentTimeMillis();
+        try {
+            return next.getWeather(user, city);
+        } finally {
+            long duration = System.currentTimeMillis() - start;
+            System.out.println(city + " took " + duration + "ms");
         }
-
-        real.send(n);
     }
 }`
 
-const step5 = `NotificationSender real = new ExternalSender();
+const step4 = `// 5. THE PROTECTION PROXY
+public class RateLimitingWeatherServiceProxy implements WeatherService {
+    private final WeatherService next;
+    private final RateLimiter limiter;
 
-NotificationSender proxy = new SenderProxy(
-    real, env, blacklist, limiter
-);
+    public RateLimitingWeatherServiceProxy(WeatherService next, RateLimiter limiter) {
+        this.next = next;
+        this.limiter = limiter;
+    }
 
-proxy.send(notification);`
+    @Override
+    public String getWeather(User user, String city) {
+        if (!limiter.allow(user)) {
+            throw new RateLimitExceeded();
+        }
+        return next.getWeather(user, city);
+    }
+}`
+
+const step5 = `WeatherService service = 
+    new RateLimitingWeatherServiceProxy(
+        new LoggingWeatherServiceProxy(
+            new CachingWeatherServiceProxy(
+                new RemoteWeatherService()
+            )
+        ),
+        limiter
+    );
+
+// Call flow: Client -> RateLimit -> Logging -> Caching -> Real
+service.getWeather(currentUser, "London");`
 
 const CODE_STEPS = [step1, step2, step3, step4, step5]
 
-// Step-by-step highlights (Indices based on non-empty lines, skipping comments where possible)
+// Step-by-step highlights (Indices based on non-empty lines)
 const STEP_HIGHLIGHTS = [
-    [0, 1, 4, 5, 6, 7],   // Interface & Real Subject
-    [0, 1, 3, 4, 7, 8, 9],  // Proxy structure & Delegation
-    [3, 4, 5, 8],           // Protection Logic
-    [3, 5, 7, 8, 11],       // Multiple concerns
-    [0, 2, 3, 6],           // Client wiring
+  [1, 2, 3],             // Step 1: Interface method (1) + Remote call (7)
+  [3, 11, 12, 13, 14, 16],           // Step 2: Cache check (11) + put (15)
+  [10, 14, 15],           // Step 3: inner call (10) + print (13)
+  [3, 12, 13, 14],           // Step 4: limit check (10) + inner call (11)
+  [0, 1, 2, 3, 4, 5, 6, 7, 8],       // Step 5: Wrapper chain
 ]
 
 function ArchitecturalNotes({ activeStep }) {
   const ref = useRef(null)
-  
+
   useEffect(() => {
-    gsap.fromTo(ref.current, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.4 })
+    gsap.fromTo(ref.current, { opacity: 0, x: 15 }, { opacity: 1, x: 0, duration: 0.3 })
   }, [activeStep])
 
-  const notes = [
+  const steps = [
     {
-      title: 'Foundation: The Contract',
-      points: [
-        'The Interface is the shared language.',
-        'The Real Subject remains "pure" and focused.',
-        'It has no idea that proxies or rules even exist.'
-      ],
-      type: 'structure'
+      req: "Extract the interface.",
+      fix: "Interface Abstraction",
+      win: "Callers only depend on the contract.",
+      color: '#2E7D32'
     },
     {
-      title: 'The Transparent Shell',
-      points: [
-        'The Proxy implements the same Interface.',
-        'It holds a reference (Composition) to the real one.',
-        'Key: The method signature never changes.'
-      ],
-      type: 'proxy'
+      req: "Handle expensive API calls.",
+      fix: "Caching Proxy",
+      win: "Expensive logic is isolated and reusable.",
+      color: '#2E7D32'
     },
     {
-      title: 'The Gatekeeper (Protection)',
-      points: [
-        'Intercepts the call before it hits the Real Subject.',
-        'Can decide to "short-circuit" (return early).',
-        'Perfect for security or environment checks.'
-      ],
-      type: 'protection'
+      req: "Audit every request time.",
+      fix: "Logging Proxy",
+      win: "Observability without touching business logic.",
+      color: '#2E7D32'
     },
     {
-      title: 'Composition over Complexity',
-      points: [
-        'We add features without modifying existing code.',
-        'The Real Subject stays simple and testable.',
-        'The Proxy orchestrates "cross-cutting concerns".'
-      ],
-      type: 'logic'
+      req: "Protect the API from abuse.",
+      fix: "Protection Proxy",
+      win: "Security is a pluggable, modular layer.",
+      color: '#2E7D32'
     },
     {
-      title: 'The "Invisible" Hand',
-      points: [
-        'The Client only sees the Interface.',
-        'Dependency Injection swaps the Proxy in.',
-        'Zero changes required in the Client business logic.'
-      ],
-      type: 'usage'
+      req: "Compose the final system.",
+      fix: "Proxy Stacking",
+      win: "Clean call flow: RateLimit -> Log -> Cache -> Real.",
+      color: '#2E7D32'
     }
   ]
 
-  const current = notes[activeStep]
+  const item = steps[activeStep]
 
   return (
-    <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div style={{ 
-        background: 'var(--success)', 
-        borderLeft: '4px solid #2E7D32', 
-        padding: '16px 20px', 
-        borderRadius: '0 12px 12px 0', 
-        boxShadow: 'var(--shadow)' 
+    <div ref={ref} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{
+        background: 'rgba(46, 125, 50, 0.04)',
+        borderLeft: '4px solid #2E7D32',
+        padding: '12px 16px',
+        borderRadius: '0 8px 8px 0',
       }}>
-        <h3 style={{ margin: 0, fontSize: 18, color: 'var(--text)', fontFamily: 'DM Sans' }}>{current.title}</h3>
+        <p style={{ fontSize: 10, fontWeight: 900, color: '#2E7D32', textTransform: 'uppercase', marginBottom: 4 }}>Manager Says</p>
+        <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', margin: 0 }}>"{item.req}"</p>
       </div>
-      
-      <ul style={{ margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {current.points.map((p, i) => (
-          <li key={i} style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.5 }}>{p}</li>
-        ))}
-      </ul>
 
-      {activeStep === 4 && (
-        <div className="callout-gold" style={{ marginTop: 20, padding: 16, fontSize: 13, borderColor: '#2E7D32', background: '#E8F5E9', color: '#1B5E20' }}>
-          💡 <strong>Key Takeaway:</strong> We solved the problem by <strong>wrapping</strong> logic instead of <strong>bloating</strong> the service. SRP is preserved!
+      <div style={{ padding: '0 16px' }}>
+        <p style={{ fontSize: 10, fontWeight: 900, color: 'var(--text-faint)', textTransform: 'uppercase', marginBottom: 4 }}>The Fix</p>
+        <p style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500, margin: 0 }}>{item.fix}</p>
+
+        <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+          <p style={{ fontSize: 13, color: '#2E7D32', fontWeight: 800 }}>
+            ✅ {item.win}
+          </p>
         </div>
-      )}
+      </div>
     </div>
   )
 }
@@ -166,7 +177,7 @@ export default function Slide06ToySolution() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
         <h2 className="slide-title" style={{ marginBottom: 0 }}>Toy Example: The Proxy Solution</h2>
         <span className="badge">Java</span>
-        <span className="badge success">Proxy Pattern (Clean)</span>
+        <span className="badge success">Refactoring to Sanity</span>
       </div>
       <p className="slide-subtitle" style={{ marginBottom: 16 }}>
         Step {activeStep + 1} of {CODE_STEPS.length} · Restoring Sanity through Composition.
@@ -174,31 +185,33 @@ export default function Slide06ToySolution() {
 
       <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 30, minHeight: 0 }}>
         <div style={{ minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-          <MagicCodeBlock 
-            codeSteps={CODE_STEPS} 
-            activeStep={activeStep} 
+          <MagicCodeBlock
+            codeSteps={CODE_STEPS}
+            activeStep={activeStep}
             stepHighlights={STEP_HIGHLIGHTS}
             lang="java"
             height="100%"
-            filename={activeStep === 0 ? "NotificationSender.java" : activeStep === 4 ? "Main.java" : "SenderProxy.java"}
+            filename={activeStep === 0 ? "WeatherService.java" : activeStep === 4 ? "AppConfig.java" : "WeatherProxies.java"}
             permanentHighlights={true}
           />
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20, paddingTop: 10 }}>
-           <div style={{ background: 'var(--success)', border: '1px solid #A5D6A7', borderRadius: 8, padding: 12 }}>
-             <p style={{ fontSize: 10, color: '#2E7D32', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800, margin: '0 0 8px 0' }}>
-               The Architectural Win
-             </p>
-             <code style={{ fontSize: 12, color: '#1B5E20', fontWeight: 700 }}>Open/Closed Principle</code>
-             <p style={{ fontSize: 12, color: '#388E3C', margin: '4px 0 0 0' }}>
-               New rules can be added via new Proxies <strong>without ever touching</strong> the core Sender or the Client.
-             </p>
+          <div style={{ background: '#E8F5E9', border: '1px solid #A5D6A7', borderRadius: 12, padding: '16px 20px' }}>
+            <p style={{ fontSize: 10, color: '#2E7D32', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800, margin: '0 0 8px 0' }}>
+              The Architectural Win
+            </p>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <span style={{ fontSize: 24 }}>🛡️</span>
+              <div>
+                <code style={{ fontSize: 13, color: '#1B5E20', fontWeight: 800 }}>The Open/Closed Principle</code>
+                <p style={{ fontSize: 11, color: '#388E3C', margin: '2px 0 0 0' }}>
+                  System is <strong>open</strong> for extension (new proxies) but <strong>closed</strong> for modification.
+                </p>
+              </div>
+            </div>
           </div>
 
-          <p style={{ fontSize: 10, color: 'var(--text-faint)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800, margin: 0 }}>
-            Architectural Insights
-          </p>
           <ArchitecturalNotes activeStep={activeStep} />
         </div>
       </div>

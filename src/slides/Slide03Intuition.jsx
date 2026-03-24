@@ -40,7 +40,7 @@ export default function ConceptualQuestion() {
           A Matter of Identity
         </h1>
         <p style={{ fontSize: 18, color: '#666', marginTop: 4, fontWeight: 500 }}>
-          Can you tell the difference?
+          The Proxy Design Pattern
         </p>
       </div>
 
@@ -92,24 +92,33 @@ export default function ConceptualQuestion() {
           </svg>
         </div>
 
-        <div style={{ maxWidth: 900, textAlign: 'center' }}>
-          <h2 style={{ fontSize: 32, fontWeight: 900, color: '#1A1A1A', marginBottom: 16 }}>
-            Who are you <span style={{ color: '#B8960C' }}>really</span> talking to?
-          </h2>
-          <div className="callout-gold" style={{ 
-            fontSize: 20, 
-            padding: '24px 40px', 
-            borderRadius: 24, 
-            lineHeight: 1.5,
-            borderLeftWidth: 8,
-            boxShadow: '0 10px 20px rgba(184, 150, 12, 0.08)'
+        <div className="two-col" style={{ maxWidth: 1000, gap: 32 }}>
+          <div className="card-gold-left" style={{ padding: '24px 32px' }}>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#B8960C', marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              The Definition
+            </h3>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: '#333', margin: 0 }}>
+              Proxy is a structural design pattern that lets you provide a <strong>substitute or placeholder</strong> for another object. 
+              A proxy controls access to the original object, allowing you to perform something either 
+              <strong>before or after</strong> the request gets through to the original object.
+            </p>
+          </div>
+
+          <div style={{ 
+            background: 'white', 
+            padding: '24px 32px', 
+            borderRadius: 16, 
+            border: '1px solid #EEE',
+            borderLeft: '4px solid #1A1A1A',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
           }}>
-            In a perfect Proxy implementation, the Client <strong>cannot tell the difference</strong>. 
-            It expects a specific interface, and the Proxy delivers it—quietly intercepting, 
-            validating, or caching behind the scenes.
-            <div style={{ fontSize: 16, marginTop: 12, borderTop: '1px solid rgba(184, 150, 12, 0.2)', paddingTop: 12, color: '#555' }}>
-              "The best Proxy is the one you never knew was there."
-            </div>
+            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#1A1A1A', marginBottom: 12, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+              The Real Use Case
+            </h3>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: '#555', margin: 0 }}>
+              In an ideal world, we’d put this code directly into our object’s class, but that isn’t always possible. 
+              For instance, the class may be part of a <strong>closed 3rd-party library</strong> that we cannot modify.
+            </p>
           </div>
         </div>
       </div>
