@@ -35,14 +35,15 @@ def _pyroInvoke(self, methodname, vargs, kwargs, flags=0, objectId=None):
 
 const CODE_STEPS = [step1, step2, step3, step4]
 
+// 0-based line indexes into each step string (must match MagicCodeBlock).
 const STEP_HIGHLIGHTS = [
-  [3, 4, 5],
-  [1, 3, 6],
-  [1, 2, 3, 5],
-  [1, 2, 4, 5, 6],
+  [3, 4, 5], // step1: proxy URI + local-looking calls
+  [1, 2, 6], // step2: __getattr__ trap, metadata guard, return _RemoteMethod
+  [2, 3, 5], // step3: __call__, handoff to __send, link to _pyroInvoke
+  [2, 4, 5, 6], // step4: serialize, send, recv, deserialize+return
 ]
 
-const VERIFY_URL = 'https://raw.githubusercontent.com/irmen/Pyro5/master/Pyro5/client.py'
+const VERIFY_URL = 'https://github.com/irmen/Pyro5/blob/master/Pyro5/client.py'
 const VERIFY_DOC_URL = 'https://pyro5.readthedocs.io/en/latest/clientcode.html'
 
 function ContextCard() {
