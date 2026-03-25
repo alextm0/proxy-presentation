@@ -39,7 +39,7 @@ const CODE_STEPS = [step1, step2, step3, step4]
 const STEP_HIGHLIGHTS = [
   [3, 4, 5], // step1: proxy URI + local-looking calls
   [1, 2, 6], // step2: __getattr__ trap, metadata guard, return _RemoteMethod
-  [2, 3, 5], // step3: __call__, handoff to __send, link to _pyroInvoke
+  [2, 3], // step3: __call__, handoff to __send, link to _pyroInvoke
   [2, 4, 5, 6], // step4: serialize, send, recv, deserialize+return
 ]
 
